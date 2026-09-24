@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790228431774,
+      "tag": "0000_inventory_core",
+      "breakpoints": true
+    }
+  ]
 }
