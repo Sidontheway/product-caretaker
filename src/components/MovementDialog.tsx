@@ -37,7 +37,7 @@ export function MovementDialog({
         product_id: productId,
         type,
         quantity: Number(quantity),
-        reference: reference || undefined,
+        ...(reference ? { reference } : {}),
       }),
     onSuccess: () => {
       queryClient.invalidateQueries();
@@ -60,7 +60,10 @@ export function MovementDialog({
           className="space-y-4"
           onSubmit={(e) => {
             e.preventDefault();
-            if (!productId) return toast.error("Pick a product first");
+            if (!productId) {
+              toast.error("Pick a product first");
+              return;
+            }
             mutation.mutate();
           }}
         >
