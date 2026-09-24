@@ -4,7 +4,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { MovementDialog } from "@/components/MovementDialog";
-import { createProduct, deleteProduct, fetchProducts, stockStatus } from "@/lib/inventory";
+import { ProductThumbnail } from "@/components/ProductThumbnail";
+import { createProduct, deleteProduct, fetchProducts, stockStatus, uploadProductImage } from "@/lib/inventory";
 
 export const Route = createFileRoute("/_authenticated/catalogue")({
   head: () => ({
@@ -40,21 +41,28 @@ function Catalogue() {
     quantity: "0",
     reorder_point: "10",
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState("");
 
   const add = useMutation({
-    mutationFn: () =>
-      createProduct({
+    mutationFn: async () => {
+      const image_url = imageFile ? await uploadProductImage(imageFile) : undefined;
+      return createProduct({
         name: form.name,
         sku: form.sku,
         category: form.category,
         supplier: form.supplier,
+        image_url,
         quantity: Number(form.quantity),
         reorder_point: Number(form.reorder_point),
-      }),
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries();
       toast.success("Product added");
       setForm({ name: "", sku: "", category: "", supplier: "", quantity: "0", reorder_point: "10" });
+      setImageFile(null);
+      setImagePreview("");
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -96,12 +104,15 @@ function Catalogue() {
                     key={p.id}
                     className="grid grid-cols-[1fr_80px_80px_110px_64px] gap-3 px-4 py-2.5 items-center hover:bg-panel/60 transition-colors"
                   >
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex items-center gap-3">
+                      <ProductThumbnail name={p.name} imageUrl={p.image_url} />
+                      <div className="min-w-0">
                       <div className="font-medium truncate">{p.name}</div>
                       <div className="text-[11px] text-ink/50 truncate">
                         {p.sku}
                         {p.category ? ` · ${p.category}` : ""}
                         {p.supplier ? ` · ${p.supplier}` : ""}
+                      </div>
                       </div>
                     </div>
                     <span className="text-right tabular-nums font-medium">{p.quantity}</span>
@@ -140,6 +151,29 @@ function Catalogue() {
               <Field label="SKU" value={form.sku} onChange={(v) => setForm({ ...form, sku: v })} required />
               <Field label="Category" value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
               <Field label="Supplier" value={form.supplier} onChange={(v) => setForm({ ...form, supplier: v })} />
+              <div>
+                <label className="block text-[11px] uppercase tracking-[0.12em] text-ink/50 mb-1.5">
+                  Product image
+                </label>
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0] ?? null;
+                    setImageFile(file);
+                    setImagePreview(file ? URL.createObjectURL(file) : "");
+                  }}
+                  className="w-full rounded-lg bg-panel/70 ring-1 ring-ink/10 px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-ink file:px-2.5 file:py-1 file:text-xs file:text-paper"
+                />
+                {imagePreview ? (
+                  <img
+                    src={imagePreview}
+                    alt="Selected product"
+                    className="mt-2 size-16 rounded-lg object-cover ring-1 ring-ink/10"
+                  />
+                ) : null}
+                <p className="mt-1 text-[11px] text-ink/45">PNG, JPG, WEBP or GIF up to 5 MB.</p>
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <Field
                   label="Opening qty"

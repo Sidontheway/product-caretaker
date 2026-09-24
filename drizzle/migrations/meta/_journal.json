@@ -8,6 +8,20 @@
       "when": 1790228431774,
       "tag": "0000_inventory_core",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790228431775,
+      "tag": "0001_product_images",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790228431776,
+      "tag": "0002_product_image_storage",
+      "breakpoints": true
     }
   ]
 }

@@ -85,8 +85,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Lexicon" },
       { property: "og:description", content: "Lexicon admin inventory operations." },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: "/logo.svg" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lexicon" },
+      { name: "twitter:image", content: "/logo.svg" },
       { name: "theme-color", content: "#1A2725" },
     ],
     links: [

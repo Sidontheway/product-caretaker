@@ -32,6 +32,7 @@ CREATE TABLE public.products (
   category text,
   supplier text,
   unit text DEFAULT 'pcs',
+  image_url text,
   quantity integer NOT NULL DEFAULT 0,
   reorder_point integer NOT NULL DEFAULT 10,
   unit_cost numeric(12,2) DEFAULT 0,

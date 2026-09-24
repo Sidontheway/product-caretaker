@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { MovementDialog } from "@/components/MovementDialog";
+import { ProductThumbnail } from "@/components/ProductThumbnail";
 import { fetchMovements, fetchProducts, type MovementType } from "@/lib/inventory";
 
 export const Route = createFileRoute("/_authenticated/movements")({
@@ -84,11 +85,17 @@ function Movements() {
                   key={m.id}
                   className="grid grid-cols-[1fr_110px_90px_150px] gap-3 px-4 py-2.5 items-center hover:bg-panel/60 transition-colors"
                 >
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex items-center gap-3">
+                    <ProductThumbnail
+                      name={m.products?.name ?? "Product"}
+                      imageUrl={m.products?.image_url}
+                    />
+                    <div className="min-w-0">
                     <div className="font-medium truncate">{m.products?.name ?? "Product"}</div>
                     <div className="text-[11px] text-ink/50 truncate">
                       {m.products?.sku}
                       {m.reference ? ` · ${m.reference}` : ""}
+                    </div>
                     </div>
                   </div>
                   <span className="text-[11px] text-ink/60">{typeLabel[m.type]}</span>

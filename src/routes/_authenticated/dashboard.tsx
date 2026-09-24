@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { MovementDialog } from "@/components/MovementDialog";
+import { ProductThumbnail } from "@/components/ProductThumbnail";
 import {
   fetchMovements,
   fetchProducts,
@@ -148,7 +149,10 @@ function Dashboard() {
                     key={p.id}
                     className="grid grid-cols-[1fr_88px_100px] gap-3 px-4 py-2.5 items-center hover:bg-panel/60 transition-colors"
                   >
-                    <span className="font-medium text-pretty truncate">{p.name}</span>
+                    <div className="flex min-w-0 items-center gap-3">
+                      <ProductThumbnail name={p.name} imageUrl={p.image_url} size="size-8" />
+                      <span className="font-medium text-pretty truncate">{p.name}</span>
+                    </div>
                     <span className="text-right tabular-nums font-medium">{p.quantity}</span>
                     <span className="text-right">
                       <span
@@ -178,7 +182,14 @@ function Dashboard() {
               moves.slice(0, 6).map((m) => (
                 <div key={m.id} className="px-4 py-2.5">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium truncate">{m.products?.name ?? "Product"}</span>
+                    <div className="flex min-w-0 items-center gap-2">
+                      <ProductThumbnail
+                        name={m.products?.name ?? "Product"}
+                        imageUrl={m.products?.image_url}
+                        size="size-8"
+                      />
+                      <span className="font-medium truncate">{m.products?.name ?? "Product"}</span>
+                    </div>
                     <span className="text-[11px] text-ink/45 tabular-nums shrink-0">
                       {new Date(m.created_at).toLocaleTimeString([], {
                         hour: "2-digit",

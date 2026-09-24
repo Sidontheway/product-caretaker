@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { MovementDialog } from "@/components/MovementDialog";
+import { ProductThumbnail } from "@/components/ProductThumbnail";
 import { fetchMovements, fetchProducts } from "@/lib/inventory";
 
 export const Route = createFileRoute("/_authenticated/returns")({
@@ -63,11 +64,17 @@ function Returns() {
             ) : (
               rows.map((m) => (
                 <div key={m.id} className="px-4 py-2.5 flex items-center justify-between gap-3">
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex items-center gap-3">
+                    <ProductThumbnail
+                      name={m.products?.name ?? "Product"}
+                      imageUrl={m.products?.image_url}
+                    />
+                    <div className="min-w-0">
                     <div className="font-medium truncate">{m.products?.name ?? "Product"}</div>
                     <div className="text-[11px] text-ink/50 truncate">
                       {m.products?.sku}
                       {m.reference ? ` · ${m.reference}` : ""}
+                    </div>
                     </div>
                   </div>
                   <div className="text-right shrink-0">

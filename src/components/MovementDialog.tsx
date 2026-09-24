@@ -9,6 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { logMovement, type MovementType, type Product } from "@/lib/inventory";
+import { ProductThumbnail } from "@/components/ProductThumbnail";
 
 const labels: Record<MovementType, string> = {
   in: "Stock In",
@@ -29,7 +30,9 @@ export function MovementDialog({
   const [productId, setProductId] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [reference, setReference] = useState("");
+  const [productMenuOpen, setProductMenuOpen] = useState(false);
   const queryClient = useQueryClient();
+  const selectedProduct = products.find((product) => product.id === productId);
 
   const mutation = useMutation({
     mutationFn: logMovement,
@@ -68,20 +71,72 @@ export function MovementDialog({
         >
           <div>
             <label className="block text-[11px] uppercase tracking-[0.12em] text-ink/50 mb-1.5">
-              Product  testy
+              Product
             </label>
-            <select
-              value={productId}
-              onChange={(e) => setProductId(e.target.value)}
-              className="w-full rounded-lg bg-panel/70 ring-1 ring-ink/10 px-3 py-2 text-sm"
-            >
-              <option value="">Select a product…</option>
-              {products.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} · {p.sku} ({p.quantity})
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <button
+                type="button"
+                aria-haspopup="listbox"
+                aria-expanded={productMenuOpen}
+                onClick={() => setProductMenuOpen((isOpen) => !isOpen)}
+                className="w-full rounded-lg bg-panel/70 ring-1 ring-ink/10 px-3 py-2 text-left text-sm"
+              >
+                {selectedProduct ? (
+                  <span className="flex items-center gap-2">
+                    <ProductThumbnail
+                      name={selectedProduct.name}
+                      imageUrl={selectedProduct.image_url}
+                      size="size-8"
+                    />
+                    <span className="min-w-0">
+                      <span className="block truncate font-medium">{selectedProduct.name}</span>
+                      <span className="block truncate text-[11px] text-ink/50">
+                        {selectedProduct.sku} · {selectedProduct.quantity} available
+                      </span>
+                    </span>
+                  </span>
+                ) : (
+                  <span className="text-ink/55">Select a product…</span>
+                )}
+              </button>
+              {productMenuOpen ? (
+                <div
+                  role="listbox"
+                  aria-label="Products"
+                  className="absolute z-20 mt-2 max-h-64 w-full overflow-auto rounded-lg bg-paper p-1 shadow-lg ring-1 ring-ink/15"
+                >
+                  {products.length === 0 ? (
+                    <div className="px-3 py-2 text-sm text-ink/55">No products available</div>
+                  ) : (
+                    products.map((product) => (
+                      <button
+                        key={product.id}
+                        type="button"
+                        role="option"
+                        aria-selected={product.id === productId}
+                        onClick={() => {
+                          setProductId(product.id);
+                          setProductMenuOpen(false);
+                        }}
+                        className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left hover:bg-panel/70"
+                      >
+                        <ProductThumbnail
+                          name={product.name}
+                          imageUrl={product.image_url}
+                          size="size-9"
+                        />
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-medium">{product.name}</span>
+                          <span className="block truncate text-[11px] text-ink/50">
+                            {product.sku} · {product.quantity} available
+                          </span>
+                        </span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              ) : null}
+            </div>
           </div>
           <div>
             <label className="block text-[11px] uppercase tracking-[0.12em] text-ink/50 mb-1.5">

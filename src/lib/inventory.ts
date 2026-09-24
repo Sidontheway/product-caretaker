@@ -9,6 +9,7 @@ export type Product = {
   category: string | null;
   supplier: string | null;
   unit: string | null;
+  image_url: string | null;
   quantity: number;
   reorder_point: number;
   unit_cost: number | null;
@@ -28,7 +29,9 @@ export type Movement = {
   created_at: string;
 };
 
-export type MovementWithProduct = Movement & { products: { name: string; sku: string } | null };
+export type MovementWithProduct = Movement & {
+  products: { name: string; sku: string; image_url: string | null } | null;
+};
 
 export function stockStatus(p: Pick<Product, "quantity" | "reorder_point">) {
   if (p.quantity <= Math.ceil(p.reorder_point / 2)) return "critical" as const;
@@ -45,10 +48,36 @@ export async function fetchProducts(): Promise<Product[]> {
   return (data ?? []) as Product[];
 }
 
+export async function uploadProductImage(file: File): Promise<string> {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Please select an image file");
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error("Product images must be 5 MB or smaller");
+  }
+
+  const { data: userData } = await supabase.auth.getUser();
+  const userId = userData.user?.id;
+  if (!userId) throw new Error("Not signed in");
+
+  const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const path = `${userId}/${crypto.randomUUID()}.${extension}`;
+  const { error } = await supabase.storage.from("product-images").upload(path, file, {
+    cacheControl: "3600",
+    upsert: false,
+  });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+  return data.publicUrl;
+}
+
 export async function fetchMovements(limit = 50): Promise<MovementWithProduct[]> {
   const { data, error } = await supabase
     .from("stock_movements")
-    .select("*, products(name, sku)")
+    .select("*, products(name, sku, image_url)")
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) throw error;
@@ -61,6 +90,7 @@ export async function createProduct(input: {
   category?: string;
   supplier?: string;
   unit?: string;
+  image_url?: string;
   quantity: number;
   reorder_point: number;
   unit_cost?: number;
