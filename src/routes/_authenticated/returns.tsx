@@ -7,9 +7,9 @@ import { fetchMovements, fetchProducts } from "@/lib/inventory";
 export const Route = createFileRoute("/_authenticated/returns")({
   head: () => ({
     meta: [
-      { title: "Returns · Nimbus" },
+      { title: "Returns · Lexicon" },
       { name: "description", content: "Returned units restocked back into your inventory." },
-      { property: "og:title", content: "Returns · Nimbus" },
+      { property: "og:title", content: "Returns · Lexicon" },
       { property: "og:description", content: "Returned units restocked back into your inventory." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

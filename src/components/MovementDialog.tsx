@@ -32,13 +32,7 @@ export function MovementDialog({
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: () =>
-      logMovement({
-        product_id: productId,
-        type,
-        quantity: Number(quantity),
-        ...(reference ? { reference } : {}),
-      }),
+    mutationFn: logMovement,
     onSuccess: () => {
       queryClient.invalidateQueries();
       toast.success(`${labels[type]} logged`);
@@ -64,12 +58,17 @@ export function MovementDialog({
               toast.error("Pick a product first");
               return;
             }
-            mutation.mutate();
+            mutation.mutate({
+              product_id: productId,
+              type,
+              quantity: Number(quantity),
+              ...(reference ? { reference } : {}),
+            });
           }}
         >
           <div>
             <label className="block text-[11px] uppercase tracking-[0.12em] text-ink/50 mb-1.5">
-              Product
+              Product  testy
             </label>
             <select
               value={productId}

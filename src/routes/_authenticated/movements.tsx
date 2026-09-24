@@ -8,9 +8,9 @@ import { fetchMovements, fetchProducts, type MovementType } from "@/lib/inventor
 export const Route = createFileRoute("/_authenticated/movements")({
   head: () => ({
     meta: [
-      { title: "Movements · Nimbus" },
+      { title: "Movements · Lexicon" },
       { name: "description", content: "Full history of stock in, stock out and returns." },
-      { property: "og:title", content: "Movements · Nimbus" },
+      { property: "og:title", content: "Movements · Lexicon" },
       { property: "og:description", content: "Full history of stock in, stock out and returns." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

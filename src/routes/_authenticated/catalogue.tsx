@@ -9,9 +9,9 @@ import { createProduct, deleteProduct, fetchProducts, stockStatus } from "@/lib/
 export const Route = createFileRoute("/_authenticated/catalogue")({
   head: () => ({
     meta: [
-      { title: "Catalogue · Nimbus" },
+      { title: "Catalogue · Lexicon" },
       { name: "description", content: "Your products, quantities and reorder points." },
-      { property: "og:title", content: "Catalogue · Nimbus" },
+      { property: "og:title", content: "Catalogue · Lexicon" },
       { property: "og:description", content: "Your products, quantities and reorder points." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

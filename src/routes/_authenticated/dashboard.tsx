@@ -13,9 +13,9 @@ import {
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Warehouse dashboard · Nimbus" },
+      { title: "Warehouse dashboard · Lexicon" },
       { name: "description", content: "Live stock levels, low-stock alerts and today's movements." },
-      { property: "og:title", content: "Warehouse dashboard · Nimbus" },
+      { property: "og:title", content: "Warehouse dashboard · Lexicon" },
       {
         property: "og:description",
         content: "Live stock levels, low-stock alerts and today's movements.",

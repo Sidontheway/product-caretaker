@@ -38,11 +38,11 @@ export function AppShell({
       <aside className="w-[224px] shrink-0 border-r border-ink/10 glass hidden md:flex flex-col">
         <div className="px-5 py-5 flex items-center gap-2.5">
           <div className="size-8 rounded-lg bg-ink grid place-items-center">
-            <span className="text-paper font-semibold text-[13px] font-display">N</span>
+            <span className="text-paper font-semibold text-[13px] font-display">L</span>
           </div>
           <div className="leading-none">
-            <div className="text-[13px] font-semibold font-display">Nimbus</div>
-            <div className="text-[11px] text-ink/55">Stock Control</div>
+            <div className="text-[13px] font-semibold font-display">Lexicon</div>
+            <div className="text-[11px] text-ink/55">Admin</div>
           </div>
         </div>
         <nav className="px-3 py-2 flex-1 space-y-0.5 text-sm">

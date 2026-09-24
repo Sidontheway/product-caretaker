@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { notifyLowStockIfNeeded } from "@/lib/low-stock-email";
 
 export type Product = {
   id: string;
@@ -69,6 +70,8 @@ export async function createProduct(input: {
   if (!userId) throw new Error("Not signed in");
   const { error } = await supabase.from("products").insert({ ...input, user_id: userId });
   if (error) throw error;
+
+  await notifyLowStockIfNeeded();
 }
 
 export async function deleteProduct(id: string) {
@@ -86,8 +89,67 @@ export async function logMovement(input: {
   const { data: userData } = await supabase.auth.getUser();
   const userId = userData.user?.id;
   if (!userId) throw new Error("Not signed in");
-  const { error } = await supabase.from("stock_movements").insert({ ...input, user_id: userId });
+
+  const { data: insertedMovement, error } = await supabase
+    .from("stock_movements")
+    .insert({ ...input, user_id: userId })
+    .select()
+    .single();
+
   if (error) throw error;
+
+  try {
+    await notifyLowStockIfNeeded();
+  } catch (notificationError) {
+    const reversalDelta = insertedMovement.type === "out"
+      ? insertedMovement.quantity
+      : -insertedMovement.quantity;
+
+    const { data: product, error: productLookupError } = await supabase
+      .from("products")
+      .select("quantity")
+      .eq("id", insertedMovement.product_id)
+      .single();
+
+    if (productLookupError) {
+      throw new Error(
+        `${notificationError instanceof Error ? notificationError.message : "Notification failed"}. ` +
+        `Stock rollback failed: ${productLookupError.message}`,
+      );
+    }
+
+    const { error: rollbackError } = await supabase
+      .from("products")
+      .update({
+        quantity: Number(product.quantity) + reversalDelta,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", insertedMovement.product_id);
+
+    if (rollbackError) {
+      throw new Error(
+        `${notificationError instanceof Error ? notificationError.message : "Notification failed"}. ` +
+        `Stock rollback failed: ${rollbackError.message}`,
+      );
+    }
+
+    const { error: deleteMovementError } = await supabase
+      .from("stock_movements")
+      .delete()
+      .eq("id", insertedMovement.id)
+      .eq("user_id", userId);
+
+    if (deleteMovementError) {
+      throw new Error(
+        `${notificationError instanceof Error ? notificationError.message : "Notification failed"}. ` +
+        `Movement rollback failed: ${deleteMovementError.message}`,
+      );
+    }
+
+    throw notificationError instanceof Error
+      ? notificationError
+      : new Error("Low-stock notification failed");
+  }
 }
 
 export function isToday(iso: string) {

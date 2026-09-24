@@ -58,11 +58,12 @@ CREATE TABLE public.stock_movements (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX stock_movements_user_created_idx ON public.stock_movements (user_id, created_at DESC);
-GRANT SELECT, INSERT ON public.stock_movements TO authenticated;
+GRANT SELECT, INSERT, DELETE ON public.stock_movements TO authenticated;
 GRANT ALL ON public.stock_movements TO service_role;
 ALTER TABLE public.stock_movements ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "own movements select" ON public.stock_movements FOR SELECT TO authenticated USING (auth.uid() = user_id);
 CREATE POLICY "own movements insert" ON public.stock_movements FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "own movements delete" ON public.stock_movements FOR DELETE TO authenticated USING (auth.uid() = user_id);
 
 CREATE OR REPLACE FUNCTION public.apply_stock_movement()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
