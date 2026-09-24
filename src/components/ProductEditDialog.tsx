@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ProductThumbnail } from "@/components/ProductThumbnail";
+import { ProductImageDropzone } from "@/components/ProductImageDropzone";
 import { updateProduct, uploadProductImage, type Product } from "@/lib/inventory";
 
 export function ProductEditDialog({ product, trigger }: { product: Product; trigger: React.ReactNode }) {
@@ -78,20 +78,14 @@ export function ProductEditDialog({ product, trigger }: { product: Product; trig
           <Field label="SKU" value={form.sku} required onChange={(value) => setForm({ ...form, sku: value })} />
           <Field label="Category" value={form.category} onChange={(value) => setForm({ ...form, category: value })} />
           <Field label="Supplier" value={form.supplier} onChange={(value) => setForm({ ...form, supplier: value })} />
-          <div>
-            <label className="block text-[11px] uppercase tracking-[0.12em] text-ink/50 mb-1.5">Product image</label>
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/webp,image/gif"
-              onChange={(event) => {
-                const file = event.target.files?.[0] ?? null;
-                setImageFile(file);
-                setImagePreview(file ? URL.createObjectURL(file) : product.image_url ?? "");
-              }}
-              className="w-full rounded-lg bg-panel/70 ring-1 ring-ink/10 px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-ink file:px-2.5 file:py-1 file:text-xs file:text-paper"
-            />
-            {imagePreview ? <ProductThumbnail name={product.name} imageUrl={imagePreview} size="size-16" /> : null}
-          </div>
+          <ProductImageDropzone
+            name={form.name}
+            imageUrl={imagePreview}
+            onFileChange={(file) => {
+              setImageFile(file);
+              setImagePreview(file ? URL.createObjectURL(file) : product.image_url ?? "");
+            }}
+          />
           <div className="grid grid-cols-2 gap-3">
             <Field label="Current qty" value={String(product.quantity)} disabled onChange={() => undefined} />
             <Field

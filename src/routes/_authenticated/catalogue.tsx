@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { MovementDialog } from "@/components/MovementDialog";
 import { ProductEditDialog } from "@/components/ProductEditDialog";
 import { ProductThumbnail } from "@/components/ProductThumbnail";
+import { ProductImageDropzone } from "@/components/ProductImageDropzone";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -184,29 +185,14 @@ function Catalogue() {
               <Field label="SKU" value={form.sku} onChange={(v) => setForm({ ...form, sku: v })} required />
               <Field label="Category" value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
               <Field label="Supplier" value={form.supplier} onChange={(v) => setForm({ ...form, supplier: v })} />
-              <div>
-                <label className="block text-[11px] uppercase tracking-[0.12em] text-ink/50 mb-1.5">
-                  Product image
-                </label>
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp,image/gif"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0] ?? null;
-                    setImageFile(file);
-                    setImagePreview(file ? URL.createObjectURL(file) : "");
-                  }}
-                  className="w-full rounded-lg bg-panel/70 ring-1 ring-ink/10 px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-ink file:px-2.5 file:py-1 file:text-xs file:text-paper"
-                />
-                {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    alt="Selected product"
-                    className="mt-2 size-16 rounded-lg object-cover ring-1 ring-ink/10"
-                  />
-                ) : null}
-                <p className="mt-1 text-[11px] text-ink/45">PNG, JPG, WEBP or GIF up to 5 MB.</p>
-              </div>
+              <ProductImageDropzone
+                name={form.name}
+                imageUrl={imagePreview}
+                onFileChange={(file) => {
+                  setImageFile(file);
+                  setImagePreview(file ? URL.createObjectURL(file) : "");
+                }}
+              />
               <div className="grid grid-cols-2 gap-3">
                 <Field
                   label="Opening qty"
