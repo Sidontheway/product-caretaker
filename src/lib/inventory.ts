@@ -90,7 +90,7 @@ export async function createProduct(input: {
   category?: string;
   supplier?: string;
   unit?: string;
-  image_url?: string;
+  image_url?: string | undefined;
   quantity: number;
   reorder_point: number;
   unit_cost?: number;
@@ -104,9 +104,46 @@ export async function createProduct(input: {
   await notifyLowStockIfNeeded();
 }
 
-export async function deleteProduct(id: string) {
-  const { error } = await supabase.from("products").delete().eq("id", id);
+export async function updateProduct(
+  id: string,
+  input: {
+    name: string;
+    sku: string;
+    category?: string;
+    supplier?: string;
+    image_url?: string;
+    reorder_point: number;
+  },
+) {
+  const { error } = await supabase
+    .from("products")
+    .update({ ...input, updated_at: new Date().toISOString() })
+    .eq("id", id);
   if (error) throw error;
+}
+
+export async function deleteProduct(id: string) {
+  const { data: product, error: lookupError } = await supabase
+    .from("products")
+    .select("quantity")
+    .eq("id", id)
+    .single();
+  if (lookupError) throw lookupError;
+  if (Number(product.quantity) > 0) {
+    throw new Error("This product cannot be removed while it has stock.");
+  }
+
+  const { data: deletedProduct, error } = await supabase
+    .from("products")
+    .delete()
+    .eq("id", id)
+    .eq("quantity", 0)
+    .select("id")
+    .maybeSingle();
+  if (error) throw error;
+  if (!deletedProduct) {
+    throw new Error("This product could not be removed because its stock changed.");
+  }
 }
 
 export async function logMovement(input: {

@@ -4,7 +4,19 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { MovementDialog } from "@/components/MovementDialog";
+import { ProductEditDialog } from "@/components/ProductEditDialog";
 import { ProductThumbnail } from "@/components/ProductThumbnail";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { createProduct, deleteProduct, fetchProducts, stockStatus, uploadProductImage } from "@/lib/inventory";
 
 export const Route = createFileRoute("/_authenticated/catalogue")({
@@ -46,16 +58,20 @@ function Catalogue() {
 
   const add = useMutation({
     mutationFn: async () => {
-      const image_url = imageFile ? await uploadProductImage(imageFile) : undefined;
-      return createProduct({
+      const input = {
         name: form.name,
         sku: form.sku,
         category: form.category,
         supplier: form.supplier,
-        image_url,
         quantity: Number(form.quantity),
         reorder_point: Number(form.reorder_point),
-      });
+      };
+      const file = imageFile;
+      if (file) {
+        const image_url = await uploadProductImage(file);
+        return createProduct({ ...input, image_url });
+      }
+      return createProduct(input);
     },
     onSuccess: () => {
       queryClient.invalidateQueries();
@@ -124,12 +140,29 @@ function Catalogue() {
                         {status}
                       </span>
                     </span>
-                    <button
-                      onClick={() => remove.mutate(p.id)}
-                      className="text-[11px] text-ink/45 hover:text-rose text-right"
-                    >
-                      Remove
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      <ProductEditDialog
+                        product={p}
+                        trigger={<button className="text-[11px] text-ink/45 hover:text-ink">Edit</button>}
+                      />
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button className="text-[11px] text-ink/45 hover:text-rose">Remove</button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-panel/95">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Remove {p.name}?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This permanently removes the product and its movement history. Continue only if its stock is zero.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => remove.mutate(p.id)}>Remove product</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
                 );
               })
