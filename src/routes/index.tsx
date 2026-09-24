@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { BrandLockup } from "@/components/BrandMark";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -60,15 +61,7 @@ function Landing() {
   return (
     <div className="min-h-screen bg-paper text-ink">
       <header className="h-14 border-b border-ink/10 glass flex items-center justify-between px-6">
-        <div className="flex items-center gap-2.5">
-          <div className="size-8 rounded-lg bg-ink grid place-items-center">
-            <span className="text-paper font-semibold text-[13px] font-display">L</span>
-          </div>
-          <div className="leading-none">
-            <div className="text-[13px] font-semibold font-display">Lexicon</div>
-            <div className="text-[11px] text-ink/55">Admin</div>
-          </div>
-        </div>
+        <BrandLockup compact />
         <Link
           to="/auth"
           className="text-sm rounded-lg px-3 py-1.5 bg-ink text-paper ring-1 ring-ink"

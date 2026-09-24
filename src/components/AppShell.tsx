@@ -2,6 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { BrandLockup } from "@/components/BrandMark";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", dot: "bg-sky" },
@@ -37,13 +38,7 @@ export function AppShell({
     <div className="min-h-screen w-full bg-paper text-ink flex antialiased">
       <aside className="w-[224px] shrink-0 border-r border-ink/10 glass hidden md:flex flex-col">
         <div className="px-5 py-5 flex items-center gap-2.5">
-          <div className="size-8 rounded-lg bg-ink grid place-items-center">
-            <span className="text-paper font-semibold text-[13px] font-display">L</span>
-          </div>
-          <div className="leading-none">
-            <div className="text-[13px] font-semibold font-display">Lexicon</div>
-            <div className="text-[11px] text-ink/55">Admin</div>
-          </div>
+          <BrandLockup compact />
         </div>
         <nav className="px-3 py-2 flex-1 space-y-0.5 text-sm">
           {nav.map((item) => (

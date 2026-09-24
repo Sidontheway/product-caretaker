@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { BrandLockup } from "@/components/BrandMark";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
@@ -56,13 +57,7 @@ function AuthPage() {
     <div className="min-h-screen bg-paper text-ink flex">
       <div className="hidden lg:flex flex-1 flex-col justify-between p-12 bg-gradient-to-b from-sky/10 via-panel/40 to-rose/10">
         <Link to="/" className="flex items-center gap-2.5">
-          <div className="size-8 rounded-lg bg-ink grid place-items-center">
-            <span className="text-paper font-semibold text-[13px] font-display">L</span>
-          </div>
-          <div className="leading-none">
-            <div className="text-[13px] font-semibold font-display">Lexicon</div>
-            <div className="text-[11px] text-ink/55">Admin</div>
-          </div>
+          <BrandLockup compact />
         </Link>
         <div className="max-w-[46ch]">
           <h2 className="font-display text-3xl font-semibold text-balance">
@@ -81,7 +76,7 @@ function AuthPage() {
       <div className="w-full lg:w-[440px] shrink-0 border-l border-ink/10 flex items-center px-6 lg:px-10 py-10">
         <div className="w-full rounded-2xl glass ring-1 ring-ink/5 p-6 shadow-sm">
           <div className="mb-6">
-            <div className="text-[13px] font-semibold font-display">Lexicon</div>
+            <BrandLockup compact />
             <div className="text-[11px] text-ink/55">Admin sign in</div>
           </div>
 
