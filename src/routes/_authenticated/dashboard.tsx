@@ -96,7 +96,7 @@ function Dashboard() {
     >
       <section className="px-6 py-5">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <Kpi label="Total SKUs" value={list.length} />
+          <Kpi label="Stock types" value={list.length} />
           <Kpi label="Low stock" value={lowStock.length} tone="text-rose" />
           <Kpi label="In today" value={inToday} tone="text-mint" />
           <Kpi label="Out today" value={outToday} tone="text-amber" />
@@ -109,11 +109,10 @@ function Dashboard() {
             <span className="size-2 rounded-full bg-rose shrink-0" />
             <p className="text-sm text-pretty text-ink/80 max-w-[70ch]">
               <span className="font-medium">
-                {lowStock.length} {lowStock.length === 1 ? "SKU is" : "SKUs are"} below reorder
+                {lowStock.length} {lowStock.length === 1 ? "stock type is" : "stock types are"} below reorder
                 point.
               </span>{" "}
               {lowStock
-                .slice(0, 3)
                 .map((p) => p.name)
                 .join(", ")}
             </p>

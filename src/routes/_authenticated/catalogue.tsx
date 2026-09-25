@@ -45,6 +45,7 @@ function Catalogue() {
   const queryClient = useQueryClient();
   const products = useQuery({ queryKey: ["products"], queryFn: fetchProducts });
   const list = products.data ?? [];
+  const totalStock = list.reduce((total, product) => total + product.quantity, 0);
 
   const [form, setForm] = useState({
     name: "",
@@ -99,7 +100,9 @@ function Catalogue() {
         <section className="lg:col-span-2 rounded-xl glass ring-1 ring-ink/5 overflow-hidden">
           <div className="px-4 py-3 border-b border-ink/10 flex items-center justify-between">
             <span className="text-sm font-semibold font-display">Products</span>
-            <span className="text-[11px] text-ink/50">{list.length} items</span>
+            <span className="text-[11px] text-ink/50">
+              {list.length} items · {totalStock} total stock
+            </span>
           </div>
           <div className="grid grid-cols-[1fr_80px_80px_110px_64px] gap-3 px-4 py-2 text-[11px] uppercase tracking-[0.1em] text-ink/50 border-b border-ink/10">
             <span>Product</span>
