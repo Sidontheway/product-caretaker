@@ -75,11 +75,11 @@ function Movements() {
           : "";
 
   const rows = (movements.data ?? []).filter((m) => {
-    const matchesType = filter === "all" || m.type === filter;
     const movementDate = formatDate(new Date(m.created_at));
     const matchesDate =
       (!rangeStart || movementDate >= rangeStart) && (!rangeEnd || movementDate <= rangeEnd);
-    return matchesType && matchesDate;
+    const matchesType = filter === "all" || m.type === filter;
+    return matchesDate && matchesType;
   });
 
   return (

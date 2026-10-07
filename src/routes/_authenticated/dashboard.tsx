@@ -2,6 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { MovementDialog } from "@/components/MovementDialog";
+import {
+  ProductPerformanceCard,
+  type ProductPerformance,
+} from "@/components/ProductPerformanceCard";
 import { ProductThumbnail } from "@/components/ProductThumbnail";
 import {
   fetchMovements,
@@ -46,7 +50,10 @@ const typeLabel: Record<MovementType, string> = {
 function Dashboard() {
   const { user } = Route.useRouteContext();
   const products = useQuery({ queryKey: ["products"], queryFn: fetchProducts });
-  const movements = useQuery({ queryKey: ["movements"], queryFn: () => fetchMovements(30) });
+  const movements = useQuery({
+    queryKey: ["movements", 1000],
+    queryFn: () => fetchMovements(1000),
+  });
 
   const list = products.data ?? [];
   const moves = movements.data ?? [];
@@ -61,6 +68,38 @@ function Dashboard() {
   const sorted = [...list].sort(
     (a, b) => a.quantity / (a.reorder_point || 1) - b.quantity / (b.reorder_point || 1),
   );
+
+  const weekStart = new Date();
+  weekStart.setHours(0, 0, 0, 0);
+  weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
+  const thisWeekMoves = moves.filter((movement) => new Date(movement.created_at) >= weekStart);
+  const performanceByProduct = new Map<string, ProductPerformance>();
+  for (const movement of thisWeekMoves) {
+    const product = performanceByProduct.get(movement.product_id) ?? {
+      id: movement.product_id,
+      name: movement.products?.name ?? "Product",
+      sku: movement.products?.sku,
+      imageUrl: movement.products?.image_url ?? null,
+      stockIn: 0,
+      stockOut: 0,
+      activity: 0,
+    };
+    if (movement.type === "in") product.stockIn += movement.quantity;
+    if (movement.type === "out") product.stockOut += movement.quantity;
+    product.activity += 1;
+    performanceByProduct.set(movement.product_id, product);
+  }
+
+  const performance = [...performanceByProduct.values()];
+  const topStockIn = performance
+    .filter((product) => product.stockIn > 0)
+    .sort((a, b) => b.stockIn - a.stockIn)
+    .slice(0, 3);
+  const topStockOut = performance
+    .filter((product) => product.stockOut > 0)
+    .sort((a, b) => b.stockOut - a.stockOut)
+    .slice(0, 3);
+  const mostActive = [...performance].sort((a, b) => b.activity - a.activity).slice(0, 3);
 
   return (
     <AppShell
@@ -128,6 +167,42 @@ function Dashboard() {
           </div>
         </div>
       ) : null}
+
+      <section aria-label="Product performance" className="space-y-3 px-6 pb-6">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 className="text-base font-semibold font-display">Product performance</h2>
+            <p className="mt-0.5 text-xs text-ink/50">Top products by units moved this week.</p>
+          </div>
+          <span className="text-[11px] text-ink/45">Based on the latest 1,000 movements</span>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-3">
+          <ProductPerformanceCard
+            title="Most stocked in"
+            metricLabel="units in"
+            products={topStockIn}
+            metric={(product) => product.stockIn}
+            emptyLabel="No stock-in movements this week."
+            tone="text-mint"
+          />
+          <ProductPerformanceCard
+            title="Most moved out"
+            metricLabel="units out"
+            products={topStockOut}
+            metric={(product) => product.stockOut}
+            emptyLabel="No stock-out movements this week."
+            tone="text-amber"
+          />
+          <ProductPerformanceCard
+            title="Most active"
+            metricLabel="movements"
+            products={mostActive}
+            metric={(product) => product.activity}
+            emptyLabel="No movements this week."
+            tone="text-sky"
+          />
+        </div>
+      </section>
 
       <section className="grid lg:grid-cols-3 gap-5 px-6 pb-6">
         <div className="lg:col-span-2 rounded-xl glass ring-1 ring-ink/5 flex flex-col overflow-hidden">
