@@ -15,7 +15,10 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "Warehouse dashboard · Lexicon" },
-      { name: "description", content: "Live stock levels, low-stock alerts and today's movements." },
+      {
+        name: "description",
+        content: "Live stock levels, low-stock alerts and today's movements.",
+      },
       { property: "og:title", content: "Warehouse dashboard · Lexicon" },
       {
         property: "og:description",
@@ -55,7 +58,9 @@ function Dashboard() {
     .filter((m) => isToday(m.created_at) && m.type === "out")
     .reduce((s, m) => s + m.quantity, 0);
 
-  const sorted = [...list].sort((a, b) => a.quantity / (a.reorder_point || 1) - b.quantity / (b.reorder_point || 1));
+  const sorted = [...list].sort(
+    (a, b) => a.quantity / (a.reorder_point || 1) - b.quantity / (b.reorder_point || 1),
+  );
 
   return (
     <AppShell
@@ -109,12 +114,10 @@ function Dashboard() {
             <span className="size-2 rounded-full bg-rose shrink-0" />
             <p className="text-sm text-pretty text-ink/80 max-w-[70ch]">
               <span className="font-medium">
-                {lowStock.length} {lowStock.length === 1 ? "stock type is" : "stock types are"} below reorder
-                point.
+                {lowStock.length} {lowStock.length === 1 ? "stock type is" : "stock types are"}{" "}
+                below reorder point.
               </span>{" "}
-              {lowStock
-                .map((p) => p.name)
-                .join(", ")}
+              {lowStock.map((p) => p.name).join(", ")}
             </p>
             <Link
               to="/catalogue"
@@ -132,38 +135,51 @@ function Dashboard() {
             <span className="text-sm font-semibold font-display">Stock levels</span>
             <span className="text-[11px] text-ink/50">Sorted by reorder urgency</span>
           </div>
-          <div className="grid grid-cols-[1fr_88px_100px] gap-3 px-4 py-2 text-[11px] uppercase tracking-[0.1em] text-ink/50 border-b border-ink/10">
-            <span>Product</span>
-            <span className="text-right">Qty</span>
-            <span className="text-right">Status</span>
-          </div>
-          <div className="flex-1 divide-y divide-ink/5 text-sm">
-            {sorted.length === 0 ? (
-              <EmptyState />
-            ) : (
-              sorted.slice(0, 10).map((p) => {
-                const status = stockStatus(p);
-                return (
-                  <div
-                    key={p.id}
-                    className="grid grid-cols-[1fr_88px_100px] gap-3 px-4 py-2.5 items-center hover:bg-panel/60 transition-colors"
-                  >
-                    <div className="flex min-w-0 items-center gap-3">
-                      <ProductThumbnail name={p.name} imageUrl={p.image_url} size="size-8" />
-                      <span className="font-medium text-pretty truncate">{p.name}</span>
-                    </div>
-                    <span className="text-right tabular-nums font-medium">{p.quantity}</span>
-                    <span className="text-right">
-                      <span
-                        className={`text-[11px] rounded-full px-2 py-0.5 ring-1 capitalize ${statusPill[status]}`}
-                      >
-                        {status}
-                      </span>
-                    </span>
-                  </div>
-                );
-              })
-            )}
+          <div className="flex-1 overflow-x-auto">
+            <table className="inventory-table min-w-[420px]">
+              <thead>
+                <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col" className="w-24 text-right">
+                    Quantity
+                  </th>
+                  <th scope="col" className="w-28 text-right">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {sorted.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="py-8 text-center">
+                      <EmptyState />
+                    </td>
+                  </tr>
+                ) : (
+                  sorted.slice(0, 10).map((p) => {
+                    const status = stockStatus(p);
+                    return (
+                      <tr key={p.id}>
+                        <td>
+                          <div className="flex min-w-0 items-center gap-3">
+                            <ProductThumbnail name={p.name} imageUrl={p.image_url} size="size-8" />
+                            <span className="truncate font-medium">{p.name}</span>
+                          </div>
+                        </td>
+                        <td className="text-right font-medium tabular-nums">{p.quantity}</td>
+                        <td className="text-right">
+                          <span
+                            className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-medium ring-1 capitalize ${statusPill[status]}`}
+                          >
+                            {status}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -174,45 +190,68 @@ function Dashboard() {
               View all
             </Link>
           </div>
-          <div className="flex-1 divide-y divide-ink/5 text-sm">
-            {moves.length === 0 ? (
-              <p className="px-4 py-6 text-[13px] text-ink/50">No movements logged yet.</p>
-            ) : (
-              moves.slice(0, 6).map((m) => (
-                <div key={m.id} className="px-4 py-2.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <ProductThumbnail
-                        name={m.products?.name ?? "Product"}
-                        imageUrl={m.products?.image_url}
-                        size="size-8"
-                      />
-                      <span className="font-medium truncate">{m.products?.name ?? "Product"}</span>
-                    </div>
-                    <span className="text-[11px] text-ink/45 tabular-nums shrink-0">
-                      {new Date(m.created_at).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between mt-0.5">
-                    <span className="text-[11px] text-ink/55 truncate">
-                      {typeLabel[m.type]}
-                      {m.reference ? ` · ${m.reference}` : ""}
-                    </span>
-                    <span
-                      className={`text-[11px] tabular-nums shrink-0 ${
-                        m.type === "out" ? "text-amber" : m.type === "return" ? "text-sky" : "text-mint"
-                      }`}
-                    >
-                      {m.type === "out" ? "−" : "+"}
-                      {m.quantity}
-                    </span>
-                  </div>
-                </div>
-              ))
-            )}
+          <div className="flex-1 overflow-x-auto">
+            <table className="inventory-table min-w-[440px]">
+              <thead>
+                <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col" className="w-24">
+                    Type
+                  </th>
+                  <th scope="col" className="w-20 text-right">
+                    Quantity
+                  </th>
+                  <th scope="col" className="w-24 text-right">
+                    Time
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {moves.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-8 text-center text-[13px] text-ink/50">
+                      No movements logged yet.
+                    </td>
+                  </tr>
+                ) : (
+                  moves.slice(0, 6).map((m) => (
+                    <tr key={m.id}>
+                      <td>
+                        <div className="flex min-w-0 items-center gap-2">
+                          <ProductThumbnail
+                            name={m.products?.name ?? "Product"}
+                            imageUrl={m.products?.image_url ?? null}
+                            size="size-8"
+                          />
+                          <span className="truncate font-medium">
+                            {m.products?.name ?? "Product"}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="text-[11px] text-ink/55">{typeLabel[m.type]}</td>
+                      <td
+                        className={`text-right text-[11px] font-medium tabular-nums ${
+                          m.type === "out"
+                            ? "text-amber"
+                            : m.type === "return"
+                              ? "text-sky"
+                              : "text-mint"
+                        }`}
+                      >
+                        {m.type === "out" ? "−" : "+"}
+                        {m.quantity}
+                      </td>
+                      <td className="text-right text-[11px] tabular-nums text-ink/45">
+                        {new Date(m.created_at).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -224,7 +263,9 @@ function Kpi({ label, value, tone }: { label: string; value: number; tone?: stri
   return (
     <div className="rounded-xl glass ring-1 ring-ink/5 px-4 py-3.5">
       <div className="text-[11px] uppercase tracking-[0.12em] text-ink/50">{label}</div>
-      <div className={`text-2xl font-semibold tabular-nums font-display ${tone ?? ""}`}>{value}</div>
+      <div className={`text-2xl font-semibold tabular-nums font-display ${tone ?? ""}`}>
+        {value}
+      </div>
     </div>
   );
 }

@@ -18,7 +18,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { createProduct, deleteProduct, fetchProducts, stockStatus, uploadProductImage } from "@/lib/inventory";
+import {
+  createProduct,
+  deleteProduct,
+  fetchProducts,
+  stockStatus,
+  uploadProductImage,
+} from "@/lib/inventory";
 
 export const Route = createFileRoute("/_authenticated/catalogue")({
   head: () => ({
@@ -78,7 +84,14 @@ function Catalogue() {
     onSuccess: () => {
       queryClient.invalidateQueries();
       toast.success("Product added");
-      setForm({ name: "", sku: "", category: "", supplier: "", quantity: "0", reorder_point: "10" });
+      setForm({
+        name: "",
+        sku: "",
+        category: "",
+        supplier: "",
+        quantity: "0",
+        reorder_point: "10",
+      });
       setImageFile(null);
       setImagePreview("");
     },
@@ -104,73 +117,99 @@ function Catalogue() {
               {list.length} items · {totalStock} total stock
             </span>
           </div>
-          <div className="grid grid-cols-[1fr_80px_80px_110px_64px] gap-3 px-4 py-2 text-[11px] uppercase tracking-[0.1em] text-ink/50 border-b border-ink/10">
-            <span>Product</span>
-            <span className="text-right">Qty</span>
-            <span className="text-right">Par</span>
-            <span className="text-right">Status</span>
-            <span />
-          </div>
-          <div className="divide-y divide-ink/5 text-sm">
-            {list.length === 0 ? (
-              <p className="px-4 py-8 text-[13px] text-ink/55">
-                No products yet — add your first one on the right.
-              </p>
-            ) : (
-              list.map((p) => {
-                const status = stockStatus(p);
-                return (
-                  <div
-                    key={p.id}
-                    className="grid grid-cols-[1fr_80px_80px_110px_64px] gap-3 px-4 py-2.5 items-center hover:bg-panel/60 transition-colors"
-                  >
-                    <div className="min-w-0 flex items-center gap-3">
-                      <ProductThumbnail name={p.name} imageUrl={p.image_url} />
-                      <div className="min-w-0">
-                      <div className="font-medium truncate">{p.name}</div>
-                      <div className="text-[11px] text-ink/50 truncate">
-                        {p.sku}
-                        {p.category ? ` · ${p.category}` : ""}
-                        {p.supplier ? ` · ${p.supplier}` : ""}
-                      </div>
-                      </div>
-                    </div>
-                    <span className="text-right tabular-nums font-medium">{p.quantity}</span>
-                    <span className="text-right tabular-nums text-ink/50">{p.reorder_point}</span>
-                    <span className="text-right">
-                      <span
-                        className={`text-[11px] rounded-full px-2 py-0.5 ring-1 capitalize ${statusPill[status]}`}
-                      >
-                        {status}
-                      </span>
-                    </span>
-                    <div className="flex items-center justify-end gap-2">
-                      <ProductEditDialog
-                        product={p}
-                        trigger={<button className="text-[11px] text-ink/45 hover:text-ink">Edit</button>}
-                      />
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <button className="text-[11px] text-ink/45 hover:text-rose">Remove</button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-panel/95">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Remove {p.name}?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This permanently removes the product and its movement history. Continue only if its stock is zero.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => remove.mutate(p.id)}>Remove product</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                );
-              })
-            )}
+          <div className="overflow-x-auto">
+            <table className="inventory-table min-w-[680px]">
+              <thead>
+                <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col" className="w-20 text-right">
+                    Quantity
+                  </th>
+                  <th scope="col" className="w-20 text-right">
+                    Par
+                  </th>
+                  <th scope="col" className="w-28 text-right">
+                    Status
+                  </th>
+                  <th scope="col" className="w-32 text-right">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {list.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-8 text-center text-[13px] text-ink/55">
+                      No products yet — add your first one on the right.
+                    </td>
+                  </tr>
+                ) : (
+                  list.map((p) => {
+                    const status = stockStatus(p);
+                    return (
+                      <tr key={p.id}>
+                        <td>
+                          <div className="flex min-w-0 items-center gap-3">
+                            <ProductThumbnail name={p.name} imageUrl={p.image_url} />
+                            <div className="min-w-0">
+                              <div className="truncate font-medium">{p.name}</div>
+                              <div className="truncate text-[11px] text-ink/50">
+                                {p.sku}
+                                {p.category ? ` · ${p.category}` : ""}
+                                {p.supplier ? ` · ${p.supplier}` : ""}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="text-right font-medium tabular-nums">{p.quantity}</td>
+                        <td className="text-right tabular-nums text-ink/50">{p.reorder_point}</td>
+                        <td className="text-right">
+                          <span
+                            className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-medium ring-1 capitalize ${statusPill[status]}`}
+                          >
+                            {status}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="flex items-center justify-end gap-3">
+                            <ProductEditDialog
+                              product={p}
+                              trigger={
+                                <button className="text-[11px] text-ink/55 hover:text-ink">
+                                  Edit
+                                </button>
+                              }
+                            />
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <button className="text-[11px] text-ink/55 hover:text-rose">
+                                  Remove
+                                </button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent className="bg-panel/95">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Remove {p.name}?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This permanently removes the product and its movement history.
+                                    Continue only if its stock is zero.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => remove.mutate(p.id)}>
+                                    Remove product
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
           </div>
         </section>
 
@@ -184,10 +223,28 @@ function Catalogue() {
                 add.mutate();
               }}
             >
-              <Field label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} required />
-              <Field label="SKU" value={form.sku} onChange={(v) => setForm({ ...form, sku: v })} required />
-              <Field label="Category" value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
-              <Field label="Supplier" value={form.supplier} onChange={(v) => setForm({ ...form, supplier: v })} />
+              <Field
+                label="Name"
+                value={form.name}
+                onChange={(v) => setForm({ ...form, name: v })}
+                required
+              />
+              <Field
+                label="SKU"
+                value={form.sku}
+                onChange={(v) => setForm({ ...form, sku: v })}
+                required
+              />
+              <Field
+                label="Category"
+                value={form.category}
+                onChange={(v) => setForm({ ...form, category: v })}
+              />
+              <Field
+                label="Supplier"
+                value={form.supplier}
+                onChange={(v) => setForm({ ...form, supplier: v })}
+              />
               <ProductImageDropzone
                 name={form.name}
                 imageUrl={imagePreview}

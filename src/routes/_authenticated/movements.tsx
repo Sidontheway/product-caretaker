@@ -56,13 +56,23 @@ function Movements() {
   const periodStart = new Date(today);
   periodStart.setDate(periodStart.getDate() - (dateFilter === "7days" ? 6 : 29));
   const rangeStart =
-    dateFilter === "week" ? formatDate(weekStart)
-      : dateFilter === "today" ? todayKey : dateFilter === "7days" || dateFilter === "30days"
-      ? formatDate(periodStart)
-      : dateFilter === "custom" ? fromDate : "";
+    dateFilter === "week"
+      ? formatDate(weekStart)
+      : dateFilter === "today"
+        ? todayKey
+        : dateFilter === "7days" || dateFilter === "30days"
+          ? formatDate(periodStart)
+          : dateFilter === "custom"
+            ? fromDate
+            : "";
   const rangeEnd =
-    dateFilter === "week" ? formatDate(weekEnd)
-      : dateFilter === "today" ? todayKey : dateFilter === "custom" ? toDate : "";
+    dateFilter === "week"
+      ? formatDate(weekEnd)
+      : dateFilter === "today"
+        ? todayKey
+        : dateFilter === "custom"
+          ? toDate
+          : "";
 
   const rows = (movements.data ?? []).filter((m) => {
     const matchesType = filter === "all" || m.type === filter;
@@ -88,43 +98,78 @@ function Movements() {
         />
       }
     >
-      <div className="p-6">
-        <div className="rounded-xl glass ring-1 ring-ink/5 overflow-hidden">
-          <div className="px-4 py-3 border-b border-ink/10 flex flex-col items-start gap-3">
-            <span className="text-sm font-semibold font-display">History</span>
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[11px] text-ink/45">Type</span>
+      <div className="space-y-4 p-6">
+        <section
+          aria-label="Movement filters"
+          className="rounded-xl glass ring-1 ring-ink/5 p-4 sm:p-5"
+        >
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 className="text-sm font-semibold font-display">History filters</h2>
+              <p className="mt-0.5 text-xs text-ink/50">Choose a movement type and date range.</p>
+            </div>
+            <span className="text-xs tabular-nums text-ink/50">
+              Showing {rows.length} of {(movements.data ?? []).length} movements
+            </span>
+          </div>
+          <div className="space-y-4">
+            <fieldset className="min-w-0">
+              <legend className="mb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-ink/50">
+                Movement type
+              </legend>
+              <div className="flex flex-wrap gap-2">
                 {filters.map((f) => (
                   <button
                     key={f}
                     onClick={() => setFilter(f)}
-                    className={`text-[11px] rounded-full px-3 py-1.5 capitalize transition-colors ${
+                    aria-pressed={filter === f}
+                    className={`rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
                       filter === f ? "bg-ink text-paper" : "bg-panel/60 text-ink/60 hover:bg-panel"
                     }`}
                   >
-                    {f === "all" ? "All" : f === "in" ? "Stock In" : f === "out" ? "Stock Out" : "Returns"}
+                    {f === "all"
+                      ? "All"
+                      : f === "in"
+                        ? "Stock In"
+                        : f === "out"
+                          ? "Stock Out"
+                          : "Returns"}
                   </button>
                 ))}
               </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[11px] text-ink/45">Date</span>
+            </fieldset>
+            <fieldset className="min-w-0">
+              <legend className="mb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-ink/50">
+                Date range
+              </legend>
+              <div className="flex flex-wrap gap-2">
                 {dateFilters.map((date) => (
                   <button
                     key={date}
                     onClick={() => setDateFilter(date)}
-                    className={`text-[11px] rounded-full px-3 py-1.5 transition-colors ${
+                    aria-pressed={dateFilter === date}
+                    className={`rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
                       dateFilter === date
                         ? "bg-ink text-paper"
                         : "bg-panel/60 text-ink/60 hover:bg-panel"
                     }`}
                   >
-                    {date === "week" ? "This week" : date === "all" ? "All time" : date === "today" ? "Today" : date === "7days" ? "Last 7 days" : date === "30days" ? "Last 30 days" : "Custom"}
+                    {date === "week"
+                      ? "This week"
+                      : date === "all"
+                        ? "All time"
+                        : date === "today"
+                          ? "Today"
+                          : date === "7days"
+                            ? "Last 7 days"
+                            : date === "30days"
+                              ? "Last 30 days"
+                              : "Custom"}
                   </button>
                 ))}
               </div>
               {dateFilter === "custom" && (
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="mt-3 flex flex-wrap items-end gap-3">
                   <label className="flex items-center gap-1.5 text-[11px] text-ink/50">
                     From
                     <input
@@ -132,7 +177,7 @@ function Movements() {
                       value={fromDate}
                       max={toDate || undefined}
                       onChange={(event) => setFromDate(event.target.value)}
-                      className="h-8 rounded-lg border border-ink/10 bg-panel/60 px-2 text-[11px] text-ink"
+                      className="h-9 rounded-lg border border-ink/10 bg-panel/60 px-2 text-xs text-ink"
                     />
                   </label>
                   <label className="flex items-center gap-1.5 text-[11px] text-ink/50">
@@ -142,60 +187,102 @@ function Movements() {
                       value={toDate}
                       min={fromDate || undefined}
                       onChange={(event) => setToDate(event.target.value)}
-                      className="h-8 rounded-lg border border-ink/10 bg-panel/60 px-2 text-[11px] text-ink"
+                      className="h-9 rounded-lg border border-ink/10 bg-panel/60 px-2 text-xs text-ink"
                     />
                   </label>
                 </div>
               )}
-            </div>
+            </fieldset>
           </div>
-          <div className="grid grid-cols-[1fr_110px_90px_150px] gap-3 px-4 py-2 text-[11px] uppercase tracking-[0.1em] text-ink/50 border-b border-ink/10">
-            <span>Product</span>
-            <span>Type</span>
-            <span className="text-right">Qty</span>
-            <span className="text-right">When</span>
+        </section>
+
+        <div className="rounded-xl glass ring-1 ring-ink/5 overflow-hidden">
+          <div className="flex items-center justify-between gap-3 border-b border-ink/10 px-4 py-3">
+            <h2 className="text-sm font-semibold font-display">Movement history</h2>
+            <span className="text-[11px] tabular-nums text-ink/50">
+              {rows.length} {rows.length === 1 ? "record" : "records"}
+            </span>
           </div>
-          <div className="divide-y divide-ink/5 text-sm">
-            {rows.length === 0 ? (
-              <p className="px-4 py-8 text-[13px] text-ink/55">
-                {(movements.data ?? []).length === 0
-                  ? "Nothing logged here yet."
-                  : "No movements match these filters."}
-              </p>
-            ) : (
-              rows.map((m) => (
-                <div
-                  key={m.id}
-                  className="grid grid-cols-[1fr_110px_90px_150px] gap-3 px-4 py-2.5 items-center hover:bg-panel/60 transition-colors"
-                >
-                  <div className="min-w-0 flex items-center gap-3">
-                    <ProductThumbnail
-                      name={m.products?.name ?? "Product"}
-                      imageUrl={m.products?.image_url ?? null}
-                    />
-                    <div className="min-w-0">
-                    <div className="font-medium truncate">{m.products?.name ?? "Product"}</div>
-                    <div className="text-[11px] text-ink/50 truncate">
-                      {m.products?.sku}
-                      {m.reference ? ` · ${m.reference}` : ""}
-                    </div>
-                    </div>
-                  </div>
-                  <span className="text-[11px] text-ink/60">{typeLabel[m.type]}</span>
-                  <span
-                    className={`text-right tabular-nums ${
-                      m.type === "out" ? "text-amber" : m.type === "return" ? "text-sky" : "text-mint"
-                    }`}
-                  >
-                    {m.type === "out" ? "−" : "+"}
-                    {m.quantity}
-                  </span>
-                  <span className="text-right text-[11px] text-ink/45 tabular-nums">
-                    {new Date(m.created_at).toLocaleString()}
-                  </span>
-                </div>
-              ))
-            )}
+          <div className="overflow-x-auto">
+            <table className="inventory-table min-w-[680px]">
+              <thead>
+                <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col" className="w-36">
+                    Type
+                  </th>
+                  <th scope="col" className="w-28 text-right">
+                    Quantity
+                  </th>
+                  <th scope="col" className="w-52 text-right">
+                    Date &amp; time
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-10 text-center text-[13px] text-ink/55">
+                      {(movements.data ?? []).length === 0
+                        ? "Nothing logged here yet."
+                        : "No movements match these filters."}
+                    </td>
+                  </tr>
+                ) : (
+                  rows.map((m) => (
+                    <tr key={m.id}>
+                      <td>
+                        <div className="flex min-w-0 items-center gap-3">
+                          <ProductThumbnail
+                            name={m.products?.name ?? "Product"}
+                            imageUrl={m.products?.image_url ?? null}
+                          />
+                          <div className="min-w-0">
+                            <div className="truncate font-medium">
+                              {m.products?.name ?? "Product"}
+                            </div>
+                            <div className="truncate text-[11px] text-ink/50">
+                              {m.products?.sku}
+                              {m.reference ? ` · ${m.reference}` : ""}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span
+                          className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-medium ring-1 ${
+                            m.type === "out"
+                              ? "bg-amber/10 text-amber ring-amber/20"
+                              : m.type === "return"
+                                ? "bg-sky/10 text-sky ring-sky/20"
+                                : "bg-mint/10 text-mint ring-mint/20"
+                          }`}
+                        >
+                          {typeLabel[m.type]}
+                        </span>
+                      </td>
+                      <td className="text-right">
+                        <span
+                          className={`font-semibold tabular-nums ${
+                            m.type === "out"
+                              ? "text-amber"
+                              : m.type === "return"
+                                ? "text-sky"
+                                : "text-mint"
+                          }`}
+                        >
+                          {m.type === "out" ? "−" : "+"}
+                          {m.quantity}
+                        </span>
+                      </td>
+                      <td className="text-right text-[11px] tabular-nums text-ink/55">
+                        {new Date(m.created_at).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
