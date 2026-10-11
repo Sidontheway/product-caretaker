@@ -168,9 +168,8 @@ export async function logMovement(input: {
   try {
     await notifyLowStockIfNeeded();
   } catch (notificationError) {
-    const reversalDelta = insertedMovement.type === "out"
-      ? insertedMovement.quantity
-      : -insertedMovement.quantity;
+    const reversalDelta =
+      insertedMovement.type === "out" ? insertedMovement.quantity : -insertedMovement.quantity;
 
     const { data: product, error: productLookupError } = await supabase
       .from("products")
@@ -181,7 +180,7 @@ export async function logMovement(input: {
     if (productLookupError) {
       throw new Error(
         `${notificationError instanceof Error ? notificationError.message : "Notification failed"}. ` +
-        `Stock rollback failed: ${productLookupError.message}`,
+          `Stock rollback failed: ${productLookupError.message}`,
       );
     }
 
@@ -196,7 +195,7 @@ export async function logMovement(input: {
     if (rollbackError) {
       throw new Error(
         `${notificationError instanceof Error ? notificationError.message : "Notification failed"}. ` +
-        `Stock rollback failed: ${rollbackError.message}`,
+          `Stock rollback failed: ${rollbackError.message}`,
       );
     }
 
@@ -209,7 +208,7 @@ export async function logMovement(input: {
     if (deleteMovementError) {
       throw new Error(
         `${notificationError instanceof Error ? notificationError.message : "Notification failed"}. ` +
-        `Movement rollback failed: ${deleteMovementError.message}`,
+          `Movement rollback failed: ${deleteMovementError.message}`,
       );
     }
 
@@ -223,6 +222,8 @@ export function isToday(iso: string) {
   const d = new Date(iso);
   const n = new Date();
   return (
-    d.getDate() === n.getDate() && d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear()
+    d.getDate() === n.getDate() &&
+    d.getMonth() === n.getMonth() &&
+    d.getFullYear() === n.getFullYear()
   );
 }

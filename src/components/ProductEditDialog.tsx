@@ -11,7 +11,13 @@ import {
 import { ProductImageDropzone } from "@/components/ProductImageDropzone";
 import { updateProduct, uploadProductImage, type Product } from "@/lib/inventory";
 
-export function ProductEditDialog({ product, trigger }: { product: Product; trigger: React.ReactNode }) {
+export function ProductEditDialog({
+  product,
+  trigger,
+}: {
+  product: Product;
+  trigger: React.ReactNode;
+}) {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
@@ -74,20 +80,43 @@ export function ProductEditDialog({ product, trigger }: { product: Product; trig
             edit.mutate();
           }}
         >
-          <Field label="Name" value={form.name} required onChange={(value) => setForm({ ...form, name: value })} />
-          <Field label="SKU" value={form.sku} required onChange={(value) => setForm({ ...form, sku: value })} />
-          <Field label="Category" value={form.category} onChange={(value) => setForm({ ...form, category: value })} />
-          <Field label="Supplier" value={form.supplier} onChange={(value) => setForm({ ...form, supplier: value })} />
+          <Field
+            label="Name"
+            value={form.name}
+            required
+            onChange={(value) => setForm({ ...form, name: value })}
+          />
+          <Field
+            label="SKU"
+            value={form.sku}
+            required
+            onChange={(value) => setForm({ ...form, sku: value })}
+          />
+          <Field
+            label="Category"
+            value={form.category}
+            onChange={(value) => setForm({ ...form, category: value })}
+          />
+          <Field
+            label="Supplier"
+            value={form.supplier}
+            onChange={(value) => setForm({ ...form, supplier: value })}
+          />
           <ProductImageDropzone
             name={form.name}
             imageUrl={imagePreview}
             onFileChange={(file) => {
               setImageFile(file);
-              setImagePreview(file ? URL.createObjectURL(file) : product.image_url ?? "");
+              setImagePreview(file ? URL.createObjectURL(file) : (product.image_url ?? ""));
             }}
           />
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Current qty" value={String(product.quantity)} disabled onChange={() => undefined} />
+            <Field
+              label="Current qty"
+              value={String(product.quantity)}
+              disabled
+              onChange={() => undefined}
+            />
             <Field
               label="Reorder point"
               type="number"
@@ -125,7 +154,9 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-[11px] uppercase tracking-[0.12em] text-ink/50 mb-1.5">{label}</label>
+      <label className="block text-[11px] uppercase tracking-[0.12em] text-ink/50 mb-1.5">
+        {label}
+      </label>
       <input
         type={type}
         required={required}

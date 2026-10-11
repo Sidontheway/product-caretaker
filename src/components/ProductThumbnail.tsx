@@ -1,9 +1,5 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 export function ProductThumbnail({
   name,
@@ -42,7 +38,11 @@ export function ProductThumbnail({
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
         <DialogContent className="max-w-3xl bg-panel/95 p-4 sm:p-6">
           <DialogTitle className="sr-only">{name} image</DialogTitle>
-          <img src={imageUrl} alt={name} className="max-h-[75vh] w-full rounded-lg object-contain" />
+          <img
+            src={imageUrl}
+            alt={name}
+            className="max-h-[75vh] w-full rounded-lg object-contain"
+          />
         </DialogContent>
       </Dialog>
     </>
