@@ -25,8 +25,14 @@ export const Route = createFileRoute("/")({
 
 const points = [
   { label: "Stock counts", text: "Live quantity per product with reorder points you set." },
-  { label: "In · Out · Return", text: "Every movement logged with a reference and a running balance." },
-  { label: "Low-stock alerts", text: "A red banner and alert list the moment a line dips below par." },
+  {
+    label: "In · Out · Return",
+    text: "Every movement logged with a reference and a running balance.",
+  },
+  {
+    label: "Low-stock alerts",
+    text: "A red banner and alert list the moment a line dips below par.",
+  },
 ];
 
 const faqs = [

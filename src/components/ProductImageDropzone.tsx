@@ -32,7 +32,9 @@ export function ProductImageDropzone({
 
   return (
     <div>
-      <label className="block text-[11px] uppercase tracking-[0.12em] text-ink/50 mb-1.5">Product image</label>
+      <label className="block text-[11px] uppercase tracking-[0.12em] text-ink/50 mb-1.5">
+        Product image
+      </label>
       <div
         role="button"
         tabIndex={0}
@@ -59,7 +61,11 @@ export function ProductImageDropzone({
           className="sr-only"
         />
         {imageUrl ? (
-          <img src={imageUrl} alt={name || "Selected product"} className="mx-auto size-16 rounded-lg object-cover ring-1 ring-ink/10" />
+          <img
+            src={imageUrl}
+            alt={name || "Selected product"}
+            className="mx-auto size-16 rounded-lg object-cover ring-1 ring-ink/10"
+          />
         ) : (
           <Upload className="mx-auto size-5 text-ink/45" aria-hidden="true" />
         )}
